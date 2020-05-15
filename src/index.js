@@ -39,7 +39,7 @@ const authLink = new ApolloLink((operation, forward) => {
     const token = localStorage.getItem('token');
 
     if (token) {
-      headers = { ...headers, 'x-token': token };
+      headers = { ...headers, Authorization: `Bearer ${token}` };
     }
 
     return { headers };

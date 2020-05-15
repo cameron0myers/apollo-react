@@ -6,7 +6,7 @@ import LandingPage from '../Landing';
 import SignUpPage from '../SignUp';
 import SignInPage from '../SignIn';
 import AccountPage from '../Account';
-import AdminPage from '../Admin';
+import ApplicationPage from '../Application';
 import withSession from '../Session/withSession';
 
 import * as routes from '../../constants/routes';
@@ -41,8 +41,8 @@ const App = ({ session, refetch }) => (
       />
       <Route
         exact
-        path={routes.ADMIN}
-        component={() => <AdminPage />}
+        path={routes.APPLICATION}
+        component={() => <ApplicationPage />}
       />
     </div>
   </Router>
