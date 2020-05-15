@@ -6,7 +6,24 @@ export const GET_ME = gql`
       id
       username
       email
-      role
+      createdAt
+      applications {
+        fields {
+          name
+          value
+        }
+        id
+        createdAt
+        userId
+        jobId
+      }
+      profile {
+        userId
+        fields {
+          name
+          value
+        }
+      }
     }
   }
 `;
