@@ -4,7 +4,7 @@ import withAuthorization from '../Session/withAuthorization';
 import Applications from './Applications';
 import ApplicationCreate from './ApplicationCreate';
 
-const ApplicationPage = () => {
+const ApplicationPage = ({ refetch }) => {
   const [isCreate, toggleCreate] = useState(false);
 
   return (

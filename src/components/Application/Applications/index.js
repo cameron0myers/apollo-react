@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import { Query } from 'react-apollo';
 import gql from 'graphql-tag';
 
@@ -36,40 +36,45 @@ const APPLICATION_CREATED = gql`
   }
 `;
 
-const Applications = ({ toggleCreate }) => (
-  <div>
+const Applications = ({ toggleCreate, isCreate }) => {
+
+  return (
     <div>
-      <button type="button" onClick={() => toggleCreate(true)}>
-        Create
-      </button>
-    </div>
-    <Query query={APPLICATIONS}>
-      {({ data, loading, error, subscribeToMore }) => {
-        if (loading) return <Loading />;
+      <div>
+        <button type="button" onClick={() => toggleCreate(true)}>
+          Create
+        </button>
+      </div>
+      <Query query={APPLICATIONS}>
+        {({ data, loading, error, refetch, subscribeToMore }) => {
+          if (loading) return <Loading />;
 
-        if (
-          !data ||
-          !data.applications ||
-          !data.applications.length
-        ) {
+          if (
+            !data ||
+            !data.applications ||
+            !data.applications.length
+          ) {
+            return (
+              <div>
+                There are no applications yet ... Try to create one by
+                yourself.
+              </div>
+            );
+          }
+
           return (
-            <div>
-              There are no applications yet ... Try to create one by
-              yourself.
-            </div>
+            <ApplicationList
+              applications={data.applications}
+              subscribeToMore={subscribeToMore}
+              refetch={refetch}
+              isCreate={isCreate}
+            />
           );
-        }
-
-        return (
-          <ApplicationList
-            applications={data.applications}
-            subscribeToMore={subscribeToMore}
-          />
-        );
-      }}
-    </Query>
-  </div>
-);
+        }}
+      </Query>
+    </div>
+  );
+};
 
 class ApplicationList extends Component {
   subscribeToMoreApplication = () => {
@@ -82,7 +87,7 @@ class ApplicationList extends Component {
 
         const { applicationCreated } = subscriptionData.data;
 
-        console.log('created');
+        console.log('created1');
         return {
           ...previousResult,
           applications: [
@@ -96,6 +101,7 @@ class ApplicationList extends Component {
 
   componentDidMount() {
     this.subscribeToMoreApplication();
+    console.log('created');
   }
 
   render() {
