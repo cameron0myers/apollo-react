@@ -1,5 +1,5 @@
 import React from 'react';
-import { Query } from 'react-apollo';
+import { Query } from '@apollo/react-components';
 import { Redirect } from 'react-router-dom';
 
 import * as routes from '../../constants/routes';
@@ -21,4 +21,10 @@ const withAuthorization = conditionFn => Component => props => (
   </Query>
 );
 
-export default withAuthorization;
+export default withAuthorization; // HOC(Higher Order Component) for authorization.
+
+// data structure
+// {
+//   me {
+//   ...
+//   if(data && data.me) 

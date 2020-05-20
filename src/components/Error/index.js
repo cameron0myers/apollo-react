@@ -6,4 +6,4 @@ const ErrorMessage = ({ error }) => (
   </div>
 );
 
-export default ErrorMessage;
+export default ErrorMessage; // rendering error message

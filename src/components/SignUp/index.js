@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom';
-import { Mutation } from 'react-apollo';
+import { Mutation } from '@apollo/react-components';
 import gql from 'graphql-tag';
 
 import * as routes from '../../constants/routes';
@@ -12,7 +12,7 @@ const SIGN_UP = gql`
       token
     }
   }
-`;
+`;// signup mutation return token
 
 const INITIAL_STATE = {
   username: '',
@@ -37,17 +37,17 @@ class SignUpForm extends Component {
   };
 
   onSubmit = (event, signUp) => {
-    signUp().then(async ({ data }) => {
+    event.preventDefault();
+
+    signUp().then(async ({ data }) => { // after signed up store the token to localStorage
       this.setState({ ...INITIAL_STATE });
 
       localStorage.setItem('token', data.signUp.token);
 
-      await this.props.refetch();
+      await this.props.refetch(); // then refetch the graphql data
 
-      this.props.history.push(routes.LANDING);
+      this.props.history.push(routes.LANDING); // then go to landing page
     });
-
-    event.preventDefault();
   };
 
   render() {
@@ -62,7 +62,7 @@ class SignUpForm extends Component {
       password !== passwordConfirmation ||
       password === '' ||
       email === '' ||
-      username === '';
+      username === ''; // validation
 
     return (
       <Mutation
@@ -70,7 +70,8 @@ class SignUpForm extends Component {
         variables={{ username, email, password }}
       >
         {(signUp, { data, loading, error }) => (
-          <form onSubmit={event => this.onSubmit(event, signUp)}>
+          // pass the signUp mutation to onSubmit
+          <form onSubmit={event => this.onSubmit(event, signUp)}> 
             <input
               name="username"
               value={username}
@@ -119,4 +120,4 @@ const SignUpLink = () => (
 
 export default withRouter(SignUpPage);
 
-export { SignUpForm, SignUpLink };
+export { SignUpLink };

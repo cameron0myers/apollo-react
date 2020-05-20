@@ -7,14 +7,14 @@ import SignOutButton from '../SignOut';
 const Navigation = ({ session }) => (
   <div>
     {session && session.me ? (
-      <NavigationAuth session={session} />
+      <NavigationAuth session={session} /> // if the session is valid, this navigation component rendered
     ) : (
-      <NavigationNonAuth />
+      <NavigationNonAuth /> // if not, this navigation component rendered
     )}
   </div>
 );
 
-const NavigationAuth = ({ session }) => (
+const NavigationAuth = ({ session }) => ( // navigation for signed in user
   <ul>
     <li>
       <Link to={routes.LANDING}>Landing</Link>
@@ -33,7 +33,7 @@ const NavigationAuth = ({ session }) => (
   </ul>
 );
 
-const NavigationNonAuth = () => (
+const NavigationNonAuth = () => ( // navigation for not signed in user
   <ul>
     <li>
       <Link to={routes.SIGN_IN}>Sign In</Link>

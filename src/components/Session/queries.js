@@ -26,4 +26,4 @@ export const GET_ME = gql`
       }
     }
   }
-`;
+`; // get my infomation using query
