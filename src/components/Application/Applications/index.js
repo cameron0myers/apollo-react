@@ -7,100 +7,70 @@ import Loading from '../../Loading';
 const APPLICATIONS = gql`
   query {
     applications {
+      id
+      createdAt
       fields {
         name
         value
       }
-      id
-      createdAt
       userId
       jobId
-    }
-  }
-`;
-
-const APPLICATION_CREATED = gql`
-  subscription {
-    applicationCreated {
-      application {
-        fields {
-          name
-          value
-        }
+      user {
         id
+        username
+        email
         createdAt
-        userId
-        jobId
+      }
+      job {
+        id
+        url
+        company
+        createdAt
+        source
+        platform
       }
     }
   }
 `;
 
-const Applications = ({ toggleCreate, isCreate }) => {
-
-  return (
+const Applications = ({ toggleCreate, isCreate }) => (
+  <div>
     <div>
-      <div>
-        <button type="button" onClick={() => toggleCreate(true)}>
-          Create
-        </button>
-      </div>
-      <Query query={APPLICATIONS}>
-        {({ data, loading, error, refetch, subscribeToMore }) => {
-          if (loading) return <Loading />;
-
-          if (
-            !data ||
-            !data.applications ||
-            !data.applications.length
-          ) {
-            return (
-              <div>
-                There are no applications yet ... Try to create one by
-                yourself.
-              </div>
-            );
-          }
-
-          return (
-            <ApplicationList
-              applications={data.applications}
-              subscribeToMore={subscribeToMore}
-              refetch={refetch}
-              isCreate={isCreate}
-            />
-          );
-        }}
-      </Query>
+      <button type="button" onClick={() => toggleCreate(true)}>
+        Create
+      </button>
     </div>
-  );
-};
+    <Query query={APPLICATIONS}>
+      {({ data, loading, error }) => {
+        if (loading) return <Loading />;
 
-class ApplicationList extends Component {
-  subscribeToMoreApplication = () => {
-    this.props.subscribeToMore({
-      document: APPLICATION_CREATED,
-      updateQuery: (previousResult, { subscriptionData }) => {
-        if (!subscriptionData.data) {
-          return previousResult;
+        if (
+          !data ||
+          !data.applications ||
+          !data.applications.length
+        ) {
+          return (
+            <div>
+              There are no applications yet ... Try to create one by
+              yourself.
+            </div>
+          );
         }
 
-        const { applicationCreated } = subscriptionData.data;
+        return (
+          <ApplicationList
+            applications={data.applications}
+            isCreate={isCreate}
+          />
+        );
+      }}
+    </Query>
+  </div>
+);
 
-        console.log('created1');
-        return {
-          ...previousResult,
-          applications: [
-            ...previousResult.applications,
-            applicationCreated.application,
-          ],
-        };
-      },
-    });
-  };
+class ApplicationList extends Component {
 
   componentDidMount() {
-    this.subscribeToMoreApplication();
     console.log('created');
   }
 
