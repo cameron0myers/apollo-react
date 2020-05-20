@@ -119,7 +119,7 @@ class ApplicationCreate extends Component {
   };
 
   update = (caches, { data: { createApplication } }) => {
-    const applications = caches.readQuery({ query: APPLICATIONS });
+    const { applications } = caches.readQuery({ query: APPLICATIONS });
     caches.writeQuery({
       query: APPLICATIONS,
       data: { applications: applications.concat([createApplication]) },
