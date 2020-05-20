@@ -7,11 +7,14 @@ import ErrorMessage from '../../Error';
 const CREATE_APPLICATION = gql`
   mutation($fields: [FieldInput!]!, $jobId: String!) {
     createApplication(fields: $fields, jobId: $jobId) {
+      id
+      createdAt
       fields {
         name
         value
       }
       userId
+      jobId
       user {
         id
         username
@@ -39,6 +42,35 @@ const GET_ALL_JOBS = gql`
       createdAt
       source
       platform
+    }
+  }
+`;
+
+const APPLICATIONS = gql`
+  query {
+    applications {
+      id
+      createdAt
+      fields {
+        name
+        value
+      }
+      userId
+      jobId
+      user {
+        id
+        username
+        email
+        createdAt
+      }
+      job {
+        id
+        url
+        company
+        createdAt
+        source
+        platform
+      }
     }
   }
 `;
@@ -86,6 +118,14 @@ class ApplicationCreate extends Component {
     } catch (error) {}
   };
 
+  update = (caches, { data: { createApplication } }) => {
+    const applications = caches.readQuery({ query: APPLICATIONS });
+    caches.writeQuery({
+      query: APPLICATIONS,
+      data: { applications: applications.concat([createApplication]) },
+    });
+  }
+
   render() {
     const { jobId, fields } = this.state;
 
@@ -124,6 +164,7 @@ class ApplicationCreate extends Component {
     return (
       <Mutation
         mutation={CREATE_APPLICATION}
+        update={this.update}
         variables={{ fields, jobId }}
       >
         {(createApplication, { loading, error }) => (
