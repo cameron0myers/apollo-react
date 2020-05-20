@@ -1,11 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { ApolloProvider } from 'react-apollo';
+import { ApolloProvider } from '@apollo/react-common';
 import { ApolloClient } from 'apollo-client';
-import { getMainDefinition } from 'apollo-utilities';
-import { ApolloLink, split } from 'apollo-link';
+import { ApolloLink } from 'apollo-link';
 import { HttpLink } from 'apollo-link-http';
-import { WebSocketLink } from 'apollo-link-ws';
 import { onError } from 'apollo-link-error';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 
@@ -13,40 +11,20 @@ import App from './components/App';
 import { signOut } from './components/SignOut';
 
 const httpLink = new HttpLink({
-  uri: 'http://localhost:8000/graphql',
-});
-
-const wsLink = new WebSocketLink({
-  uri: `ws://localhost:8000/graphql`,
-  options: {
-    reconnect: true,
-  },
-});
-
-const terminatingLink = split(
-  ({ query }) => {
-    const { kind, operation } = getMainDefinition(query);
-    return (
-      kind === 'OperationDefinition' && operation === 'subscription'
-    );
-  },
-  wsLink,
-  httpLink,
-);
+  uri: process.env.REACT_APP_GRAPHQL_URI,
+}); // configure the graphql backend
 
 const authLink = new ApolloLink((operation, forward) => {
   operation.setContext(({ headers = {} }) => {
     const token = localStorage.getItem('token');
-
     if (token) {
       headers = { ...headers, Authorization: `Bearer ${token}` };
     }
-
     return { headers };
   });
 
   return forward(operation);
-});
+}); // configure the auth middleware
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors) {
@@ -66,18 +44,19 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
       signOut(client);
     }
   }
-});
+}); // configure the error handling middleware
 
-const link = ApolloLink.from([authLink, errorLink, terminatingLink]);
+const link = ApolloLink.from([authLink, errorLink, httpLink]); // combine all middlewares
 
-const cache = new InMemoryCache();
+const cache = new InMemoryCache(); // use memory cache for client storage
 
 const client = new ApolloClient({
   link,
   cache,
-});
+}); // create apollo client
 
 ReactDOM.render(
+  // pass the apollo client by provider
   <ApolloProvider client={client}>
     <App />
   </ApolloProvider>,

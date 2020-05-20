@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import { Mutation } from 'react-apollo';
+import { Mutation } from '@apollo/react-components';
 import gql from 'graphql-tag';
 
 import { SignUpLink } from '../SignUp';
@@ -13,7 +13,7 @@ const SIGN_IN = gql`
       token
     }
   }
-`;
+`; // sign in mutation return the token
 
 const SignInPage = ({ history, refetch }) => (
   <div>
@@ -37,23 +37,23 @@ class SignInForm extends Component {
   };
 
   onSubmit = (event, signIn) => {
+    event.preventDefault();
+
     signIn().then(async ({ data }) => {
       this.setState({ ...INITIAL_STATE });
 
-      localStorage.setItem('token', data.signIn.token);
+      localStorage.setItem('token', data.signIn.token); // store the token
 
-      await this.props.refetch();
+      await this.props.refetch(); // then refetch the graphql data
 
-      this.props.history.push(routes.LANDING);
+      this.props.history.push(routes.LANDING); // then go to the landing page
     });
-
-    event.preventDefault();
   };
 
   render() {
     const { login, password } = this.state;
 
-    const isInvalid = password === '' || login === '';
+    const isInvalid = password === '' || login === ''; // validation
 
     return (
       <Mutation mutation={SIGN_IN} variables={{ login, password }}>
@@ -85,6 +85,6 @@ class SignInForm extends Component {
   }
 }
 
-export default withRouter(SignInPage);
+export default withRouter(SignInPage); // withRouter pass the routing context to SignInPage (history, router, etc)
 
 export { SignInForm };

@@ -4,9 +4,9 @@ import gql from 'graphql-tag';
 
 import ErrorMessage from '../../Error';
 
-const CREATE_PROFILE = gql`
+const UPDATE_PROFILE = gql`
   mutation($fields: [FieldInput!]!) {
-    createProfile(fields: $fields) {
+    updateProfile(fields: $fields) {
       id
       fields {
         name
@@ -29,10 +29,17 @@ const CREATE_PROFILE = gql`
   }
 `;
 
-class ProfileCreate extends Component {
+class ProfileUpdate extends Component {
   state = {
     fields: [],
   };
+
+  componentDidMount() {
+    const { fields } = this.props;
+    this.setState({
+      fields: fields.map(({ name, value }) => ({ name, value })), // filtering the attributes
+    });
+  }
 
   onChange = (event, id, name) => {
     const { value } = event.target;
@@ -58,11 +65,11 @@ class ProfileCreate extends Component {
     });
   };
 
-  onSubmit = async (event, createProfile) => {
+  onSubmit = async (event, updateProfile) => {
     event.preventDefault();
 
     try {
-      await createProfile();
+      await updateProfile();
       this.props.toggleCreate(false);
     } catch (error) {}
   };
@@ -70,8 +77,8 @@ class ProfileCreate extends Component {
   render() {
     const { fields } = this.state;
 
-    const renderFields = (fields) =>
-      fields.map(({ name, value }, i) => (
+    const renderFields = (data) =>
+      data.map(({ name, value }, i) => (
         <div key={i}>
           <span>Name :</span>
           <input
@@ -87,13 +94,10 @@ class ProfileCreate extends Component {
       ));
 
     return (
-      <Mutation
-        mutation={CREATE_PROFILE}
-        variables={{ fields }}
-      >
-        {(createProfile, { loading, error }) => (
+      <Mutation mutation={UPDATE_PROFILE} variables={{ fields }}>
+        {(updateProfile, { loading, error }) => (
           <div>
-            {renderFields(fields)}
+            <div>{renderFields(fields)}</div>
             <button
               type="button"
               onClick={this.onAdd}
@@ -103,9 +107,7 @@ class ProfileCreate extends Component {
             </button>
             <button
               type="button"
-              onClick={(event) =>
-                this.onSubmit(event, createProfile)
-              }
+              onClick={(event) => this.onSubmit(event, updateProfile)}
               disabled={loading}
             >
               Submit
@@ -118,4 +120,4 @@ class ProfileCreate extends Component {
   }
 }
 
-export default ProfileCreate;
+export default ProfileUpdate;

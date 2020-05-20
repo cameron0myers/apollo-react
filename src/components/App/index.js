@@ -13,12 +13,15 @@ import * as routes from '../../constants/routes';
 import history from '../../constants/history';
 
 const App = ({ session, refetch }) => (
+  // pass your own history handler
   <Router history={history}>
     <div>
+      {/* navigation */}
       <Navigation session={session} />
 
       <hr />
 
+      {/* routes */}
       <Route
         exact
         path={routes.LANDING}

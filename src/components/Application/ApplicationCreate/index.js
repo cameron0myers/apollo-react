@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Mutation, Query } from 'react-apollo';
+import { Mutation, Query } from '@apollo/react-components';
 import gql from 'graphql-tag';
 
 import ErrorMessage from '../../Error';
@@ -31,7 +31,7 @@ const CREATE_APPLICATION = gql`
       }
     }
   }
-`;
+`; // createApplication mutation for creating an application
 
 const GET_ALL_JOBS = gql`
   query {
@@ -44,7 +44,7 @@ const GET_ALL_JOBS = gql`
       platform
     }
   }
-`;
+`; // query for getting all job listings
 
 const APPLICATIONS = gql`
   query {
@@ -73,7 +73,7 @@ const APPLICATIONS = gql`
       }
     }
   }
-`;
+`; // query for getting all applications
 
 class ApplicationCreate extends Component {
   state = {
@@ -85,11 +85,12 @@ class ApplicationCreate extends Component {
     const { value } = event.target;
     const updatedFields = [...this.state.fields];
     updatedFields.splice(id, 1, {
+      // update the array using splice
       ...updatedFields[id],
       [name]: value,
     });
     this.setState({ fields: updatedFields });
-  };
+  }; // input change handling
 
   onAdd = (event) => {
     const { fields } = this.state;
@@ -103,39 +104,46 @@ class ApplicationCreate extends Component {
         },
       ],
     });
-  };
+  }; // add a field to the application
 
   onJobSelected = (event) => {
     this.setState({ jobId: event.target.value });
-  };
+  }; // job select handling
 
   onSubmit = async (event, createApplication) => {
-    event.preventDefault();
+    event.preventDefault(); // block the auto form submit
 
     try {
-      await createApplication();
-      this.props.toggleCreate(false);
+      await createApplication(); // call createApplication mutation for creating new application
+      this.props.toggleCreate(false); // after submitting, toggle the isCreate variable
     } catch (error) {}
   };
 
   update = (caches, { data: { createApplication } }) => {
-    const { applications } = caches.readQuery({ query: APPLICATIONS });
+    // after create update the graphql cache storage
+    const { applications } = caches.readQuery({
+      query: APPLICATIONS,
+    });
     caches.writeQuery({
       query: APPLICATIONS,
-      data: { applications: applications.concat([createApplication]) },
+      data: {
+        applications: applications.concat([createApplication]),
+      },
     });
-  }
+  };
 
   render() {
     const { jobId, fields } = this.state;
 
-    const renderFields = (fields) =>
-      fields.map(({ name, value }, i) => (
+    const renderFields = (
+      data, // rendering fields
+    ) =>
+      data.map(({ name, value }, i) => (
         <div key={i}>
           <span>Name :</span>
           <input
             value={name}
-            onChange={(e) => this.onChange(e, i, 'name')}
+            onChange={(e) => this.onChange(e, i, 'name')} // onChange(event, index of this object in the array, the key of this value in the object)
           />
           <span>Value :</span>
           <input
@@ -144,13 +152,22 @@ class ApplicationCreate extends Component {
           />
         </div>
       ));
+    // [
+    //   {name: 'Name', value: 'Bill Gates'},
+    //   {name: 'Email', value: 'bill@microsift.com'},
+    // ]
 
     const renderSelect = ({ data, loading, error }) => {
+      // rendering job select component
       if (loading) return 'Loading...';
       if (error) return `Error! ${error.message}`;
 
       return (
-        <select name="job" onChange={this.onJobSelected} value={jobId}>
+        <select
+          name="job"
+          onChange={this.onJobSelected}
+          value={jobId}
+        >
           {data.jobs.map((job) => (
             <option key={job.id} value={job.id}>
               {`${job.company} - ${job.source}`}
@@ -162,7 +179,7 @@ class ApplicationCreate extends Component {
     };
 
     return (
-      <Mutation
+      <Mutation // pass the graphql mutation and update function to props. the update function is called after the end of mutation call
         mutation={CREATE_APPLICATION}
         update={this.update}
         variables={{ fields, jobId }}
@@ -187,7 +204,7 @@ class ApplicationCreate extends Component {
               }
               disabled={loading}
             >
-              Send
+              Submit
             </button>
             {error && <ErrorMessage error={error} />}
           </div>

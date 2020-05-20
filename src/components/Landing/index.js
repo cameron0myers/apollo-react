@@ -8,4 +8,4 @@ const Landing = ({ session }) => (
   </div>
 );
 
-export default withSession(Landing);
+export default withSession(Landing); // landing page ( you can make landing page per signed in user or not signed in user with session )

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Query } from 'react-apollo';
+import { Query } from '@apollo/react-components';
 import gql from 'graphql-tag';
 
 import Loading from '../../Loading';
@@ -31,7 +31,7 @@ const APPLICATIONS = gql`
       }
     }
   }
-`;
+`; // get applications using graphql query
 
 const Applications = ({ toggleCreate, isCreate }) => (
   <div>
@@ -68,21 +68,14 @@ const Applications = ({ toggleCreate, isCreate }) => (
   </div>
 );
 
-class ApplicationList extends Component {
-
-  componentDidMount() {
-    console.log('created');
-  }
-
-  render() {
-    const { applications } = this.props;
-
-    return applications.map((application) => (
+const ApplicationList = ({ applications }) => ( // render the applications
+  <>
+    {applications.map((application) => (
       <div key={application.id}>
         <h5>{`${application.jobId} - ${application.createdAt}`}</h5>
       </div>
-    ));
-  }
-}
+    ))}
+  </>
+);
 
 export default Applications;

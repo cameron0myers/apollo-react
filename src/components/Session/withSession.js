@@ -1,5 +1,5 @@
 import React from 'react';
-import { Query } from 'react-apollo';
+import { Query } from '@apollo/react-components';
 import { GET_ME } from './queries';
 
 const withSession = Component => props => (
@@ -10,4 +10,4 @@ const withSession = Component => props => (
   </Query>
 );
 
-export default withSession;
+export default withSession; // HOC(Higher Order Component) for getting a current session.
